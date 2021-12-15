@@ -9,7 +9,7 @@ void Dictionary::Word::swap(Word &other) {
     *this = tmp;
 }
 
-void Dictionary::binSearch(const char *eng, int &back, int &front) {
+void Dictionary::binSearch(const char *eng, int &back, int &front) const {
     back = -1;
     front = words_cnt;
     int mid = 0;
@@ -82,6 +82,28 @@ void Dictionary::deleteWord(const char *eng) {
     --words_cnt;
 }
 
+const char *Dictionary::findRusByEng(const char *eng) const {
+    int back = 0;
+    int front = 0;
+    if (!words_cnt) {
+        return nullptr;
+    }
+    binSearch(eng, back, front);
+    if (back != front) {
+        return nullptr;
+    }
+    return word_arr[front].rus;
+}
+
+const char *Dictionary::findEngByRus(const char *rus) const {
+    for (int finding = 0; finding != words_cnt; ++finding) {
+        if (!strcmp(word_arr[finding].rus, rus)) {
+            return word_arr[finding].eng;
+        }
+    }
+    return nullptr;
+}
+
 std::ostream &operator<<(std::ostream &os, const Dictionary &dictionary) {
     os << dictionary.words_cnt << '\n';
     for (int i = 0; i < dictionary.words_cnt; ++i) {
@@ -89,4 +111,17 @@ std::ostream &operator<<(std::ostream &os, const Dictionary &dictionary) {
     }
     os.flush();
     return os;
+}
+
+std::istream &operator>>(std::istream &is, Dictionary &dictionary) {
+    int add_cnt = 0;
+    is >> add_cnt;
+    char eng[MAX_WORD_SIZE];
+    char rus[MAX_WORD_SIZE];
+    for (int i = 0; i < add_cnt; ++i) {
+        is >> eng;
+        is >> rus;
+        dictionary.addWord(eng, rus);
+    }
+    return is;
 }
